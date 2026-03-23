@@ -1,0 +1,632 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #050505;
+  --text: #f4f4f4;
+  --text-strong: rgba(244, 244, 244, 0.9);
+  --text-soft: rgba(244, 244, 244, 0.8);
+  --text-muted: rgba(244, 244, 244, 0.75);
+  --text-dim: rgba(244, 244, 244, 0.6);
+  --line: rgba(244, 244, 244, 0.3);
+  --border: rgba(244, 244, 244, 0.2);
+  --surface: #050505;
+}
+
+html[data-theme="light"] {
+  --bg: #f5f5f2;
+  --text: #131313;
+  --text-strong: rgba(19, 19, 19, 0.9);
+  --text-soft: rgba(19, 19, 19, 0.8);
+  --text-muted: rgba(19, 19, 19, 0.7);
+  --text-dim: rgba(19, 19, 19, 0.58);
+  --line: rgba(19, 19, 19, 0.3);
+  --border: rgba(19, 19, 19, 0.2);
+  --surface: #ffffff;
+}
+
+html {
+  /* Nav scroll is driven in JS (rAF); CSS smooth + programmatic scroll fights and reads as an instant jump. */
+  scroll-behavior: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background-color: var(--bg);
+  /*
+   * Backdrop-filter (theme wipe) forces grayscale AA on text underneath; without this,
+   * removing the overlay restores subpixel AA and edges look suddenly sharper.
+   * Grayscale smoothing stays consistent before, during, and after the transition.
+   */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+::selection {
+  background: rgba(148, 163, 184, 0.35);
+  color: inherit;
+}
+
+body {
+  @apply antialiased;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  cursor: none;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Beat UA / component cursors (links, buttons, etc.) so only .cursor-dot shows */
+html,
+body,
+html * {
+  cursor: none !important;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+#root {
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+.portfolio-root {
+  min-height: 100vh;
+  padding: 1.6rem 2.4rem 3rem;
+}
+
+/* Inverts against underlying content (difference + white), including over the polaroid */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: none;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  transition: width 200ms ease, height 200ms ease, opacity 200ms ease;
+}
+
+.cursor-dot.is-enlarged {
+  width: 54px;
+  height: 54px;
+  opacity: 1;
+}
+
+/* Opaque surface — avoids blend/stacking making the frame look washed out */
+.contact-polaroid-frame {
+  background-color: #ffffff;
+  opacity: 1;
+  mix-blend-mode: normal;
+  isolation: isolate;
+}
+
+.site-header {
+  position: fixed;
+  top: 1.4rem;
+  left: 2.4rem;
+  right: 2.4rem;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  mix-blend-mode: difference;
+}
+
+/* difference blend breaks legibility when using dark text on a light page */
+html[data-theme="light"] .site-header {
+  mix-blend-mode: normal;
+}
+
+.site-header .mail {
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+.header-identity {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Out of flow so the email line aligns with nav; "PROGRAMMER" sits below without shifting the mail */
+.header-programmer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.32rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 260ms ease, transform 260ms ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.header-programmer.is-visible {
+  opacity: 0.85;
+  transform: translateY(0);
+}
+
+.site-header nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.site-header nav a {
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.45;
+  font-size: 0.92rem;
+  transition: opacity 200ms ease;
+}
+
+.site-header nav a.is-active,
+.site-header nav a:hover {
+  opacity: 1;
+}
+
+.site-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.mail-link {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.back-to-top {
+  position: fixed;
+  left: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 35;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.back-to-top-icon {
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.75rem;
+  line-height: 1;
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+
+.back-to-top-floating-label {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 36;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translate(1.2rem, calc(100vh - 4.5rem));
+  pointer-events: none;
+  transition: opacity 80ms linear;
+}
+
+.back-to-top:hover .back-to-top-icon,
+.back-to-top:focus-visible .back-to-top-icon {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+.back-to-top-floating-label.is-visible {
+  opacity: 1;
+}
+
+.theme-toggle-floating-label {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 36;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  max-width: calc(100vw - 16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms linear;
+}
+
+.theme-toggle-floating-label.is-visible {
+  opacity: 1;
+}
+
+/* Follows pointer via left/top (not transform — avoids fighting GSAP x/y on other labels) */
+.cursor-drag-floating-label {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  z-index: 36;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  /* Fixed dark — polaroid frame is always light; var(--text) is light in dark theme and vanishes on white */
+  color: #131313;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms linear;
+}
+
+.cursor-drag-floating-label.is-visible {
+  opacity: 1;
+}
+
+.ui-left,
+.ui-right {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ui-left {
+  left: 0.9rem;
+  top: 45%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: left top;
+}
+
+.ui-right {
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  transform-origin: right top;
+}
+
+.ui-left a {
+  color: var(--text-strong);
+  text-decoration: none;
+}
+
+.theme-toggle {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: none;
+  transition: color 200ms ease, opacity 200ms ease;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  color: var(--text);
+  opacity: 1;
+}
+
+.theme-toggle:disabled {
+  opacity: 0.45;
+  cursor: none;
+}
+
+main {
+  margin-top: 5rem;
+}
+
+.hero-section {
+  position: relative;
+  min-height: 145vh;
+  padding-top: 9rem;
+}
+
+.hero-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.hero-line {
+  margin: 0;
+  font-size: clamp(2.5rem, 10.5vw, 10rem);
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.intro {
+  margin-top: clamp(8rem, 14vw, 14rem);
+  max-width: 58rem;
+  margin-inline: auto;
+  display: grid;
+  gap: 1.2rem;
+  text-align: center;
+}
+
+.intro p {
+  margin: 0;
+  font-size: clamp(1rem, 1.7vw, 1.35rem);
+  line-height: 1.5;
+  color: var(--text-soft);
+  display: block;
+}
+
+.section-block {
+  min-height: 100vh;
+  padding-top: 12rem;
+}
+
+.section-block h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(1.45rem, 3vw, 2.3rem);
+  letter-spacing: 0.03em;
+}
+
+.work-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Pinned horizontal scroll (GSAP ScrollTrigger) */
+.work-horizontal-section {
+  position: relative;
+  margin-left: -2.4rem;
+  margin-right: -2.4rem;
+  width: calc(100% + 4.8rem);
+}
+
+.work-horizontal-inner {
+  width: 100%;
+  overflow: hidden;
+}
+
+.work-horizontal-track {
+  display: flex;
+  flex-wrap: nowrap;
+  will-change: transform;
+}
+
+.work-horizontal-panel {
+  flex: 0 0 100%;
+  width: 100%;
+  min-height: 100vh;
+  padding: 12rem 2.4rem 3rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.work-panel-inner {
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+  transform-style: preserve-3d;
+}
+
+.work-horizontal-heading {
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.45rem, 3vw, 2.3rem);
+  letter-spacing: 0.03em;
+}
+
+.work-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.work-card p {
+  margin: 0;
+  color: var(--text-dim);
+}
+
+.work-card h3 {
+  margin: 0;
+  font-weight: 500;
+}
+
+.contact-block p {
+  margin: 0;
+  font-size: clamp(1.4rem, 3.6vw, 2.8rem);
+  letter-spacing: 0.01em;
+}
+
+.contact-links {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.contact-links a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 900px) {
+  .portfolio-root {
+    padding-top: 1rem;
+    padding-bottom: 2.5rem;
+    padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
+  }
+
+  .site-header {
+    left: max(1.5rem, env(safe-area-inset-left, 0px));
+    right: max(1.5rem, env(safe-area-inset-right, 0px));
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .site-header-right {
+    gap: 0.35rem;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  /* Theme sits in the header row — no extra empty band on the right */
+  .site-header .ui-right {
+    position: static;
+    top: auto;
+    right: auto;
+    transform: rotate(90deg);
+    transform-origin: center center;
+    z-index: 1;
+  }
+
+  .site-header nav {
+    gap: 0.65rem;
+    flex-shrink: 0;
+  }
+
+  .site-header nav a {
+    font-size: 0.84rem;
+  }
+
+  .site-header .mail {
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+
+  .back-to-top {
+    left: max(0.9rem, env(safe-area-inset-left, 0px));
+    bottom: max(0.9rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .back-to-top-floating-label {
+    display: none;
+  }
+
+  .theme-toggle-floating-label {
+    display: none;
+  }
+
+  .ui-left {
+    display: none;
+  }
+
+  .hero-section {
+    padding-top: 7rem;
+    padding-bottom: 0;
+  }
+
+  /* Narrower hero type + horizontal room so parallax / scroll motion reads */
+  .hero-line {
+    font-size: clamp(2rem, 9.5vw, 5.5rem);
+  }
+
+  /*
+   * Give the headline stack real vertical presence so the bio isn’t in the first viewport.
+   * (min-height auto on .hero-section was collapsing the hero + intro into one screen.)
+   */
+  .hero-track {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    min-height: min(58vh, 32rem);
+  }
+
+  .intro {
+    margin-top: clamp(12rem, 36vh, 26rem);
+    padding-bottom: 2rem;
+  }
+
+  .section-block {
+    min-height: auto;
+    padding-top: 7rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .work-horizontal-section {
+    margin-left: calc(-1 * max(1.5rem, env(safe-area-inset-left, 0px)));
+    margin-right: calc(-1 * max(1.5rem, env(safe-area-inset-right, 0px)));
+    width: calc(
+      100% + max(1.5rem, env(safe-area-inset-left, 0px)) + max(1.5rem, env(safe-area-inset-right, 0px))
+    );
+  }
+
+  .work-horizontal-panel {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-top: 7rem;
+    padding-bottom: 1.5rem;
+    padding-left: max(1.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.75rem, env(safe-area-inset-right, 0px));
+    align-items: center;
+  }
+
+  .contact-links {
+    flex-wrap: wrap;
+  }
+
+  .contact-block {
+    padding-bottom: max(3rem, calc(2rem + env(safe-area-inset-bottom, 0px)));
+  }
+}
+
+/*
+ * Expanding circle: inverts only what’s behind it (current theme colors stay visible through the page).
+ * Sits above .portfolio-root; transparent so content is never covered by a flat color.
+ */
+.theme-wipe-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  background: transparent;
+  -webkit-backdrop-filter: invert(1);
+  backdrop-filter: invert(1);
+  clip-path: circle(0% at 50% 50%);
+  animation: theme-wipe-expand 1.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* One frame with full-size transparent layer, no invert — matches next paint when overlay is removed */
+.theme-wipe-overlay.theme-wipe-overlay--no-backdrop {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  animation: none;
+  clip-path: circle(150% at 50% 50%);
+}
+
+@keyframes theme-wipe-expand {
+  from {
+    clip-path: circle(0% at 50% 50%);
+  }
+  to {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
